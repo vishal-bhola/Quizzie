@@ -252,16 +252,26 @@ app.post("/showresult",async (req,res)=>{
 app.get("/test/:id",(req,res)=>{
 
 if(req.cookies.email){
+  var flag=0;
   user.findOne({Email:req.cookies.email})
   .then((loginuser)=>{
     if(loginuser){
   var testid = req.params.id;
-  record.findOne({Email:req.cookies.email})
+  record.find({Email:req.cookies.email})
   .then((records)=>{
     if(records)
     {
-      if(records.TestNo==testid){
-       res.send({done:200});
+      console.log(records)
+      for(var i=0;i<records.length;i++)
+      {
+       if(records[i].TestNo==testid){
+         flag=1;
+         break;
+        }
+      }
+      if(flag==1)
+      {
+        res.send({done:201});
       }
       else{
           que.find({Testno:testid})

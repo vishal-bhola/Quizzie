@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <%- include('bootstrap') %>
+</head>
+<body>
+    <% if ( records ) { %>
+        <table class="table">
+            <thead class="thead-dark">
+                <tr class="text-center">
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Max. Marks</th>
+                    <th scope="col">Marks</th>
+                    <th scope="col">Percentage</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Date</th>
+                </tr>
+            </thead>
+            
+            <tbody>
+                <% for(var i=0;i< records.length;i++) {%>
+                    <tr class="text-center">
+                        <td><%= records[i].Name %></td>
+                        <td><%= records[i].Email %></td>
+                        <td><%= records[i].Maxmarks %></td>
+                        <td><%= records[i].Marks %></td>
+                        <td><%= records[i].Percentage %></td>
+                       <% if(records[i].Status === "Passed" ){ %> 
+                        <td style="color:#019031"><%= records[i].Status %></td>
+                        <% } else{%>
+                        <td style="color:#E8290B"><%= records[i].Status %></td>
+                        <% } %>    
+                            <td><%= records[i].Date %></td>
+                    </tr>
+            
+                <% } %>
+            </tbody>
+        </table>
+    <% } %>  
+</body>
+</html>

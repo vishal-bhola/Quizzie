@@ -1,0 +1,172 @@
+<html>
+    <head>
+        <title>Register to Quizzie</title>
+        <%- include('bootstrap') %>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    </head>
+	<body>
+		<h1 style="text-align:center">Register to Quizzie</h3>
+
+
+      <div class="container mt-2 p-4 shadow-lg">
+            <form id="form"> 
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                       <label for="validationServer01">First name</label>
+                       <input type="text" class="form-control " id="name" placeholder="First name" name="name" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                      <label for="validationServer02">Email</label>
+                      <input type="email" class="form-control " placeholder="abc123@xyz.com" name="email" id="emailid" required>
+                    </div>
+                </div>    
+                  <div class="row">
+                      
+                    <div class="col-md-6 mb-3">
+                          <label for="validationServer03">Password</label>
+                          <input type="password" class="form-control "  name="pwd" id="password" placeholder="Password" required>
+                          
+                        </div>
+                        <div class="col-md-6 mb-3">
+                          <label for="validationServer04">Confirm-password</label>
+                          <input type="password" class="form-control " name="cpwd" id="cnfrmpassword" placeholder="Confirm-password" required>
+                        </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12 mb-3">
+                      <label for="validationServer05">Phone</label>
+                      <input type="tel" class="form-control " minLength="10" name="phone" maxLength="10" id="phone" placeholder="+91 XXXXXXXXXX" required>
+                    </div>
+                   </div>  
+                  <div class="row">
+                  <div class="form-group ml-3">
+                    <div class="form-check">
+                      <input class="form-check-input " type="checkbox" value="" id="invalidCheck3" required>
+                      <label class="form-check-label" for="invalidCheck3">
+                        Agree to terms and conditions
+                      </label>
+                      <div class="invalid-feedback">
+                        You must agree before submitting.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                  
+                  <center><button class="btn btn-primary" id="registerButton" type="submit" >Register Now</button></center>
+                 <div class="row">
+                  <a href="/login/0" class="ml-3 btn btn-outline-success">Login from Here?</a>
+                 </div>
+          </form>
+  
+      </div>
+
+</body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+
+ <script>
+
+document.getElementById("registerButton").addEventListener("click",function(event){
+
+    event.preventDefault();
+
+    var pwd1 = document.getElementById("password").value;
+    var pwd2 = document.getElementById("cnfrmpassword").value;
+    var name = document.getElementById("name").value;
+    var email = document.getElementById("emailid").value;
+    var phone = document.getElementById("phone").value;
+
+    console.log(email)
+
+    axios.post('/registerUser', {name,email,pwd1,pwd2,phone})
+    .then((res)=>
+    {
+    if(res.data.success==="added")
+      {
+       makeAlert();
+       document.getElementById("form").reset();
+      }
+      else if(res.data.error==="mismatch") {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Password Mismatch',
+        })
+        document.getElementById("form").reset();
+      }
+
+      else if(res.data.error==="already")
+      {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Already Registered',
+        })
+        document.getElementById("form").reset();
+      }
+
+      else if(res.data.error==="empty")
+      {
+        
+        Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Fill Empty Fields',
+        })
+        document.getElementById("form").reset();
+      }
+      else if(res.data.error==="admin")
+      {
+        Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Not allowed to registered with this email',
+        })
+        document.getElementById("form").reset();
+      }
+
+    })
+    .catch((err)=>
+    {
+      console.log(err);
+    })
+})
+
+</script> 
+  
+
+ <script>
+ 
+ function makeAlert()
+{
+  let timerInterval
+  Swal.fire({
+    title: '<h2>Good job!</h2>',
+    html: '<h3>Registered Successfully</h3>',
+    timer: 1000,
+    timerProgressBar: true,
+    onBeforeOpen: () => {
+      Swal.showLoading()
+      timerInterval = setInterval(() => {
+        Swal.getContent().querySelector('b')
+          .textContent = Swal.getTimerLeft()
+      }, 100)
+    },
+    onClose: () => {
+      clearInterval(timerInterval)
+      location.replace("/login/0");
+    }
+  }).then((result) => {
+    if (
+      result.dismiss === Swal.DismissReason.timer
+    ) {
+      console.log('I was closed by the timer')
+    }
+  })
+}
+ 
+ </script> 
+
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <%- include('bootstrap') %>
+</head>
+
+<body>
+
+    <% if( data ){ %>
+        <% for(i=0;i<data.length;i++){ %>
+            
+            <div class="align-items-center ml-5" style="margin-top:4%">
+                <h4>Que <%= (i+1) %>:- <span><%= data[i].Que %></span></h4>
+                
+                <div class="custom-control custom-radio">
+                    <input 
+                    onchange="demo(this)"
+                    value="<%= data[i].Opt1 %>"
+                    type="radio"
+                    class="custom-control-input" id="defaultUnchecked1<%= data[i]._id %>" name="<%= data[i]._id %>">
+                    <label class="custom-control-label" for="defaultUnchecked1<%= data[i]._id %>"><%= data[i].Opt1 %></label>
+                </div>
+               
+                <div class="custom-control custom-radio">
+                    <input 
+                    onchange="demo(this)"
+                    value="<%= data[i].Opt2 %>"
+                    type="radio" class="custom-control-input" id="defaultUnchecked2<%= data[i]._id %>" name="<%= data[i]._id %>">
+                    <label class="custom-control-label" for="defaultUnchecked2<%= data[i]._id %>"><%= data[i].Opt2 %></label>
+                </div>
+
+                <div class="custom-control custom-radio">
+                    <input 
+                    onchange="demo(this)"
+                    value="<%= data[i].Opt3 %>"
+                    type="radio" class="custom-control-input" id="defaultUnchecked3<%= data[i]._id %>" name="<%= data[i]._id %>">
+                    <label class="custom-control-label" for="defaultUnchecked3<%= data[i]._id %>"><%= data[i].Opt3 %></label>
+                </div>
+
+                <div class="custom-control custom-radio">
+                    <input 
+                    onchange="demo(this)"
+                    value="<%= data[i].Opt4 %>"
+                    type="radio" class="custom-control-input" id="defaultUnchecked4<%= data[i]._id %>" name="<%= data[i]._id %>">
+                    <label class="custom-control-label" for="defaultUnchecked4<%= data[i]._id %>"><%= data[i].Opt4 %></label>
+                </div>
+                <br>
+                <hr>
+            </div>
+            <% } %>
+            <button type="submit" style="margin-left:10%" onclick="finish(event)" class="btn btn-success ml-5">Submit Test</button>
+     <% } %>   
+
+
+     
+<script>
+        window.location.hash="no-back-button";
+        window.location.hash="Again-No-back-button";//again because google chrome don't insert first hash into history
+        window.onhashchange=function(){window.location.hash="no-back-button";}
+</script>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<script>
+var array=[];
+
+function demo(e)
+{
+    const qid=e.id.substr(17, e.id.length);
+    const ans=e.value;
+    var obj={};
+    obj.qid=qid
+    obj.ans=ans;
+    let flag=0;
+    for(let i=0;i<array.length;i++)
+    {
+        if(array[i].qid==obj.qid)
+        {
+            array[i].ans=obj.ans;
+            flag=1;
+            break;
+        }
+    }
+    if(flag==0){
+    array.push(obj);
+    }
+
+    console.log(array)
+}
+
+function finish(event)
+{
+    console.log(array);
+
+    $.ajax({
+        url: "/showresult",
+        type: 'POST',
+        data: {array},
+        cache: false,
+        timeout: 30000,
+        error: function(){
+            return true;
+        },
+        success: function(msg){ 
+            if(msg.prcnt>50){
+            Swal.fire("Congratulations! You Passed","You Scored: "+msg.mark,"success")
+            .then((result)=>{
+                location.replace("/")
+            }) 
+            }
+            else{
+                Swal.fire("Sorry! You scored less than 50%","You Scored: "+msg.mark,"error")
+                .then((result)=>{
+                    location.replace("/")
+                })
+            }
+        }
+    });
+
+    // axios.post("/showresult",{array})
+    // .then((res)=>{
+
+    //     if(res.data.success)
+    //     {
+    //         console.log(res.data.success)
+    //         if(res.data.success>60)
+    //         Swal.fire(
+    //         'Good job!',
+    //         'You have cleared the test',
+    //         'success'
+    //         )
+    //         else{
+    //             Swal.fire(
+    //             'Sorry!',
+    //             'You have scored less than 60%',
+    //             'error'
+    //             )
+    //         }
+    //     }
+    // })
+}
+
+
+</script>
+
+</body>
+
+
+
+
+</html>

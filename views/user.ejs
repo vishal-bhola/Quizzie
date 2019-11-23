@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <%- include('bootstrap') %>
+  <script>
+    window.location.hash = "no-back-button";
+    window.location.hash = "Again-No-back-button";
+    window.onhashchange = function () {
+      window.location.hash = "no-back-button";
+    }
+  </script>
+
+  <style>
+    .disabledbutton {
+      pointer-events: none;
+      opacity: 0.4;
+    }
+
+    .show {
+      display: none;
+    }
+  </style>
+
+</head>
+
+<body oncontextmenu="return false">
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">Quizzie</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">About</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link" href="#">Contact</a>
+        </li>
+      </ul>
+      <% if(data) { %>
+      <ul class="navbar-nav mr-auto" style="margin-left:60%">
+        <li class="nav-item">
+          <b class="nav-link">Hi! <%= data %> </b>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/logOut">LogOut</a>
+        </li>
+      </ul>
+      <% } else{ %>
+      <ul class="navbar-nav mr-auto" style="margin-left:60%">
+        <li class="nav-item">
+          <a class="nav-link" href="/login/0">Login</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/register">Signup</a>
+        </li>
+      </ul>
+      <% } %>
+    </div>
+  </nav>
+
+  <center>
+    <div style="margin-top:20%" id="testlink">
+      <input type="text" placeholder="Enter Test Code" id="testcode">
+      <button class="btn btn-primary" onclick="entertest(event)" id="testbtn ">Start Test</button>
+    </div>
+  </center>
+
+  <div id="testpage" class="container m-5 show"> </div>
+
+</body>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+
+<script>
+
+  function entertest(event) {
+    var id = document.getElementById("testcode").value;
+    if (id != "") {
+      $("#testlink").remove();
+      var str = "";
+      axios.get("/test/" + id)
+        .then((res) => {
+          if (res.data.success===200) {
+            location.href="/testpage/"+id; 
+          } 
+          else if (res.data.error === 400) {
+            let timerInterval
+            Swal.fire({
+              title: 'Wrong Test Code',
+              html: '',
+              timer: 1000,
+              timerProgressBar: false,
+              onBeforeOpen: () => {
+                Swal.showLoading()
+                timerInterval = setInterval(() => {
+                  Swal.getContent().querySelector('b')
+                    .textContent = Swal.getTimerLeft()
+                }, 100)
+              },
+              onClose: () => {
+                clearInterval(timerInterval)
+                location.reload();
+              }
+            }).then((result) => {
+              if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.timer
+              ) {
+                console.log('I was closed by the timer') // eslint-disable-line
+              }
+            })
+          }
+          else if(res.data.done===200)
+          {
+            Swal.fire(
+              'Not Allowed?',
+              'You have already done the test',
+              'question'
+            )
+            .then((result)=>{
+              location.reload();
+            })
+          }
+          else if(res.data.error===202)
+          {
+            location.href="/login/0"
+          }
+        })
+    } else {
+      Swal.fire(
+        'Enter Your Test Code',
+      )
+    }
+  }
+</script>
+
+</html>
